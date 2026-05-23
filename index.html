@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bhavya's Training Journal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --cream: #F6F2EC;
+    --cream-dark: #EDE8DF;
+    --ink: #2A2520;
+    --ink-light: #6B6258;
+    --ink-faint: #A89F96;
+    --line: #DDD6CC;
+    --accent: #8B7355;
+  }
+
+  body.dark {
+    --cream: #1A1814;
+    --cream-dark: #221F1B;
+    --ink: #E8E2D9;
+    --ink-light: #A89F93;
+    --ink-faint: #6B6258;
+    --line: #2E2A25;
+    --accent: #B8966A;
+  }
+
+  /* DARK MODE TOGGLE */
+  .theme-toggle {
+    position: absolute;
+    top: 50%;
+    right: 24px;
+    transform: translateY(-50%);
+    background: none;
+    border: 1px solid var(--line);
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-faint);
+    transition: color 0.2s, border-color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .theme-toggle:hover { color: var(--ink); border-color: var(--ink-faint); }
+  .theme-toggle svg { width: 16px; height: 16px; stroke-width: 1.5; }
+  .icon-sun { display: none; }
+  .icon-moon { display: block; }
+  body.dark .icon-sun { display: block; }
+  body.dark .icon-moon { display: none; }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding-bottom: 80px;
+    -webkit-font-smoothing: antialiased;
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+
+  h1, h2, h3, .serif { font-family: 'Lora', serif; }
+
+  /* SCREENS */
+  .screen { display: none; min-height: calc(100vh - 80px); }
+  .screen.active { display: block; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--cream);
+    border-top: 1px solid var(--line);
+    display: flex;
+    z-index: 100;
+    height: 68px;
+  }
+  .nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ink-faint);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 8px 4px;
+    transition: color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-btn.active { color: var(--ink); }
+  .nav-btn svg { width: 20px; height: 20px; stroke-width: 1.5; }
+  .nav-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .nav-btn.active .nav-dot { opacity: 1; }
+
+  /* HEADER */
+  .page-header {
+    padding: 48px 24px 24px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+  .page-header .eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+  }
+  .page-header h1 {
+    font-size: clamp(26px, 6vw, 34px);
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .page-header p {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--ink-light);
+    line-height: 1.6;
+    max-width: 480px;
+  }
+
+  /* DAY TABS */
+  .day-tabs {
+    display: flex;
+    gap: 0;
+    padding: 20px 24px 0;
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .day-tabs::-webkit-scrollbar { display: none; }
+  .day-tab {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    background: none;
+    border: 1px solid var(--line);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    transition: all 0.2s;
+    margin-right: -1px;
+  }
+  .day-tab:first-child { border-radius: 2px 0 0 2px; }
+  .day-tab:last-child { border-radius: 0 2px 2px 0; }
+  .day-tab.active {
+    background: var(--ink);
+    color: var(--cream);
+    border-color: var(--ink);
+    z-index: 1;
+  }
+
+  /* WORKOUT CONTENT */
+  .workout-day { display: none; }
+  .workout-day.active { display: block; }
+
+  /* SECTION BLOCKS */
+  .section-block {
+    padding: 28px 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  .section-label {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'Lora', serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .section-note {
+    font-size: 12px;
+    color: var(--ink-light);
+    line-height: 1.6;
+    margin-bottom: 16px;
+    font-style: italic;
+  }
+
+  /* STRETCH ITEMS */
+  .stretch-list { display: flex; flex-direction: column; gap: 10px; }
+  .stretch-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .stretch-item:last-child { border-bottom: none; }
+  .stretch-num {
+    font-size: 11px;
+    color: var(--ink-faint);
+    min-width: 20px;
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .stretch-info { flex: 1; }
+  .stretch-name {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+  .stretch-detail {
+    font-size: 12px;
+    color: var(--ink-light);
+  }
+
+  /* EXERCISE CARDS */
+  .exercise-list { display: flex; flex-direction: column; gap: 0; }
+  .exercise-item {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+  }
+  .exercise-item:last-child { border-bottom: none; }
+  .exercise-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .exercise-left { flex: 1; }
+  .exercise-num {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 4px;
+  }
+  .exercise-name {
+    font-family: 'Lora', serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .exercise-muscle {
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .exercise-sets {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .sets-label {
+    font-family: 'Lora', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--ink);
+  }
+  .sets-sub {
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: 0.06em;
+  }
+  .sets-weight {
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 500;
+    margin-top: 5px;
+    letter-spacing: 0.02em;
+    line-height: 1.3;
+  }
+  .exercise-expand {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease;
+  }
+  .exercise-expand.open { max-height: 200px; }
+  .exercise-note {
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--ink-light);
+    line-height: 1.7;
+    padding: 10px 12px;
+    background: var(--cream-dark);
+    border-left: 2px solid var(--accent);
+  }
+  .weight-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    padding: 5px 10px;
+    border: 1px solid var(--accent);
+    border-radius: 2px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+  }
+  .weight-badge span {
+    font-family: 'Lora', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .expand-icon {
+    font-size: 18px;
+    color: var(--ink-faint);
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 14px;
+    transition: transform 0.2s;
+  }
+  .exercise-item.open .expand-icon { transform: rotate(45deg); }
+
+  /* PROGRESSION SCREEN */
+  .rule-block {
+    padding: 28px 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  .rule-number {
+    font-size: 48px;
+    font-family: 'Lora', serif;
+    font-weight: 400;
+    color: var(--line);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .rule-title {
+    font-family: 'Lora', serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .rule-body {
+    font-size: 13px;
+    color: var(--ink-light);
+    line-height: 1.75;
+  }
+  .rule-body strong { color: var(--ink); font-weight: 500; }
+  .rule-highlight {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: var(--cream-dark);
+    border-left: 2px solid var(--accent);
+    font-size: 12px;
+    color: var(--ink-light);
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  /* PLAN SCREEN */
+  .phase-header {
+    padding: 28px 24px 16px;
+    border-bottom: 1px solid var(--line);
+    background: var(--cream-dark);
+  }
+  .phase-label {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 6px;
+  }
+  .phase-title {
+    font-family: 'Lora', serif;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .phase-weeks {
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .phase-desc {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--ink-light);
+    line-height: 1.65;
+  }
+
+  .week-list { padding: 0 24px; }
+  .week-row {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: start;
+  }
+  .week-row:last-child { border-bottom: none; }
+  .week-num {
+    font-family: 'Lora', serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--ink-faint);
+    padding-top: 2px;
+  }
+  .week-content {}
+  .week-focus {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
+  .week-detail {
+    font-size: 12px;
+    color: var(--ink-light);
+    line-height: 1.6;
+  }
+  .week-tag {
+    display: inline-block;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 2px 7px;
+    margin-top: 6px;
+    border-radius: 1px;
+  }
+
+  /* DELOAD ROW */
+  .week-row.deload { background: var(--cream-dark); margin: 0 -24px; padding: 16px 24px; }
+
+  /* SCROLL PADDING */
+  .scroll-area { overflow-y: auto; }
+
+  /* PROFILE BANNER */
+  .profile-banner {
+    margin: 20px 24px 0;
+    padding: 16px;
+    border: 1px solid var(--line);
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  .profile-stat {
+    flex: 1;
+    text-align: center;
+  }
+  .stat-val {
+    font-family: 'Lora', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--ink);
+    display: block;
+  }
+  .stat-key {
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    display: block;
+    margin-top: 2px;
+  }
+  .stat-divider {
+    width: 1px;
+    height: 36px;
+    background: var(--line);
+  }
+</style>
+</head>
+<body>
+
+<!-- SCREEN 1: WORKOUTS -->
+<div class="screen active" id="screen-workouts">
+  <div class="page-header">
+    <div class="eyebrow">Bhavya Jain · Age 25</div>
+    <h1>Training<br><em>Journal</em></h1>
+    <p>4-day Upper/Lower split · Science-backed · Jeff Nippard method · Anytime Fitness</p>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <div class="profile-banner">
+    <div class="profile-stat">
+      <span class="stat-val">60</span>
+      <span class="stat-key">kg start</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="profile-stat">
+      <span class="stat-val">4</span>
+      <span class="stat-key">days/wk</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="profile-stat">
+      <span class="stat-val">45'</span>
+      <span class="stat-key">per session</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="profile-stat">
+      <span class="stat-val">52</span>
+      <span class="stat-key">week plan</span>
+    </div>
+  </div>
+
+  <!-- DAY TABS -->
+  <div class="day-tabs">
+    <button class="day-tab active" onclick="switchDay('upper1')">Upper A</button>
+    <button class="day-tab" onclick="switchDay('lower1')">Lower A</button>
+    <button class="day-tab" onclick="switchDay('upper2')">Upper B</button>
+    <button class="day-tab" onclick="switchDay('lower2')">Lower B</button>
+  </div>
+
+  <!-- UPPER A -->
+  <div class="workout-day active" id="day-upper1">
+    <!-- Warmup -->
+    <div class="section-block">
+      <div class="section-label">Warmup · 5 min</div>
+      <div class="section-title">Dynamic Preparation</div>
+      <p class="section-note">Activate the nervous system and prime the joints before loading.</p>
+      <div class="stretch-list">
+        <div class="stretch-item">
+          <span class="stretch-num">01</span>
+          <div class="stretch-info">
+            <div class="stretch-name">Arm Circles</div>
+            <div class="stretch-detail">30 sec forward, 30 sec backward · Shoulder joint</div>
+          </div>
+        </div>
+        <div class="stretch-item">
+          <span class="stretch-num">02</span>
+          <div class="stretch-info">
+            <div class="stretch-name">Band Pull-Aparts</div>
+            <div class="stretch-detail">2 × 15 reps · Rear delts, scapular retractors</div>
+          </div>
+        </div>
+        <div class="stretch-item">
+          <span class="stretch-num">03</span>
+          <div class="stretch-info">
+            <div class="stretch-name">Wall Slides</div>
+            <div class="stretch-detail">10 reps · Shoulder mobility, thoracic extension</div>
+          </div>
+        </div>
+        <div class="stretch-item">
+          <span class="stretch-num">04</span>
+          <div class="stretch-info">
+            <div class="stretch-name">Scapular Push-Ups</div>
+            <div class="stretch-detail">10 reps · Serratus anterior activation</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Exercises -->
+    <div class="section-block">
+      <div class="section-label">Main Work · Upper A — Chest &amp; Back Focus</div>
+      <div class="exercise-list">
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header">
+            <div class="exercise-left">
+              <div class="exercise-num">Exercise 01 of 06</div>
+              <div class="exercise-name">Flat Dumbbell Press</div>
+              <div class="exercise-muscle">Chest · Anterior Delt · Triceps</div>
+            </div>
+            <div class="exercise-sets">
+              <div class="sets-label">1×4-6</div>
+              <div class="sets-sub">+ 1×8-10</div>
+              <div class="sets-weight">10 kg / hand</div>
+            </div>
+            <span class="expand-icon">+</span>
+          </div>
+          <div class="exercise-expand">
+            <div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>10 kg DBs</span>&nbsp; per hand</div><br>Heavy set first (RPE 9), then back-off set at ~75% load (7.5kg DBs). Elbow tuck 30–45° on descent. Greater ROM than barbell — prioritized for minimalist training. Key: control the eccentric.</div>
+          </div>
+        </div>
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header">
+            <div class="exercise-left">
+              <div class="exercise-num">Exercise 02 of 06</div>
+              <div class="exercise-name">Chest-Supported Incline Row</div>
+              <div class="exercise-muscle">Mid-Traps · Lats · Rear Delts · Biceps</div>
+            </div>
+            <div class="exercise-sets">
+              <div class="sets-label">3×10-12</div>
+              <div class="sets-sub">sets × reps</div>
+              <div class="sets-weight">8 kg / hand</div>
+            </div>
+            <span class="expand-icon">+</span>
+          </div>
+          <div class="exercise-expand">
+            <div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>8 kg DBs</span>&nbsp; per hand</div><br>Lie face-down on incline bench. Eliminates lower back fatigue. Drive elbows back, squeeze shoulder blades at top. Superset with Ex.01 in later phases to save time.</div>
+          </div>
+        </div>
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header">
+            <div class="exercise-left">
+              <div class="exercise-num">Exercise 03 of 06</div>
+              <div class="exercise-name">2-Grip Lat Pulldown</div>
+              <div class="exercise-muscle">Lats · Biceps · Mid-Back</div>
+            </div>
+            <div class="exercise-sets">
+              <div class="sets-label">2×10-12</div>
+              <div class="sets-sub">sets × reps</div>
+              <div class="sets-weight">25–30 kg stack</div>
+            </div>
+            <span class="expand-icon">+</span>
+          </div>
+          <div class="exercise-expand">
+            <div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>25–30 kg</span>&nbsp; stack</div><br>Set 1: overhand wide grip (mid-back focus). Set 2: underhand close grip (bicep emphasis). Full stretch at top — don't cut the ROM. Strip 30% for bonus overhead curls after Set 2.</div>
+          </div>
+        </div>
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header">
+            <div class="exercise-left">
+              <div class="exercise-num">Exercise 04 of 06</div>
+              <div class="exercise-name">Cable Lateral Raise</div>
+              <div class="exercise-muscle">Lateral Deltoid</div>
+            </div>
+            <div class="exercise-sets">
+              <div class="sets-label">2×12-15</div>
+              <div class="sets-sub">+ dropset</div>
+              <div class="sets-weight">5 kg cable</div>
+            </div>
+            <span class="expand-icon">+</span>
+          </div>
+          <div class="exercise-expand">
+            <div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>5 kg</span>&nbsp; cable stack</div><br>Cable provides constant tension — superior to dumbbells for deltoid isolation. Lead with elbow, not wrist. Hit failure, drop 30–40%, go to failure again. This is your shoulder width builder.</div>
+          </div>
+        </div>
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header">
+            <div class="exercise-left">
+              <div class="exercise-num">Exercise 05 of 06</div>
+              <div class="exercise-name">Overhead Cable Tricep Extension</div>
+              <div class="exercise-muscle">Triceps Long Head</div>
+            </div>
+            <div class="exercise-sets">
+              <div class="sets-label">1×12-15</div>
+              <div class="sets-sub">+ dropset</div>
+              <div class="sets-weight">10–12 kg cable</div>
+            </div>
+            <span class="expand-icon">+</span>
+          </div>
+          <div class="exercise-expand">
+            <div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>10–12 kg</span>&nbsp; cable stack</div><br>Research (Mayo et al. 2022): overhead position produces ~40% more tricep hypertrophy vs. pressdowns. Cable behind head, lock elbows, squeeze hard. Drop 30% at failure for extended set.</div>
+          </div>
+        </div>
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header">
+            <div class="exercise-left">
+              <div class="exercise-num">Exercise 06 of 06</div>
+              <div class="exercise-name">EZ-Bar Bicep Curl</div>
+              <div class="exercise-muscle">Biceps Brachii</div>
+            </div>
+            <div class="exercise-sets">
+              <div class="sets-label">1×12-15</div>
+              <div class="sets-sub">+ myo-reps</div>
+              <div class="sets-weight">15 kg EZ bar</div>
+            </div>
+            <span class="expand-icon">+</span>
+          </div>
+          <div class="exercise-expand">
+            <div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>15 kg</span>&nbsp; EZ bar total</div><br>Curl OUT and UP, not just up. Drive through pinky for supination. Hit failure, then Myo-Rep: rest 3–4s, do 4 reps. Repeat until you can't get 4. Maximally hypertrophic reps only.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Cooldown -->
+    <div class="section-block">
+      <div class="section-label">Cooldown · 5 min</div>
+      <div class="section-title">Static Restoration</div>
+      <p class="section-note">Hold each stretch for 30–45 seconds. Breathe deep.</p>
+      <div class="stretch-list">
+        <div class="stretch-item">
+          <span class="stretch-num">01</span>
+          <div class="stretch-info">
+            <div class="stretch-name">Doorway Chest Stretch</div>
+            <div class="stretch-detail">45 sec each side · Pec minor, anterior capsule</div>
+          </div>
+        </div>
+        <div class="stretch-item">
+          <span class="stretch-num">02</span>
+          <div class="stretch-info">
+            <div class="stretch-name">Cross-Body Shoulder Stretch</div>
+            <div class="stretch-detail">30 sec each arm · Posterior delt, rotator cuff</div>
+          </div>
+        </div>
+        <div class="stretch-item">
+          <span class="stretch-num">03</span>
+          <div class="stretch-info">
+            <div class="stretch-name">Lat Stretch (kneeling)</div>
+            <div class="stretch-detail">45 sec · Latissimus dorsi, teres major</div>
+          </div>
+        </div>
+        <div class="stretch-item">
+          <span class="stretch-num">04</span>
+          <div class="stretch-info">
+            <div class="stretch-name">Overhead Tricep Stretch</div>
+            <div class="stretch-detail">30 sec each arm · Triceps long head</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOWER A -->
+  <div class="workout-day" id="day-lower1">
+    <div class="section-block">
+      <div class="section-label">Warmup · 5 min</div>
+      <div class="section-title">Dynamic Preparation</div>
+      <p class="section-note">Mobilize hips and knees before heavy lower body loading.</p>
+      <div class="stretch-list">
+        <div class="stretch-item"><span class="stretch-num">01</span><div class="stretch-info"><div class="stretch-name">Leg Swings</div><div class="stretch-detail">15 forward/back + 15 lateral · Hip flexors, glutes</div></div></div>
+        <div class="stretch-item"><span class="stretch-num">02</span><div class="stretch-info"><div class="stretch-name">Bodyweight Squat to Stand</div><div class="stretch-detail">10 reps slow · Ankle, hip, thoracic mobility</div></div></div>
+        <div class="stretch-item"><span class="stretch-num">03</span><div class="stretch-info"><div class="stretch-name">Hip Circles</div><div class="stretch-detail">10 each direction · Hip capsule lubrication</div></div></div>
+        <div class="stretch-item"><span class="stretch-num">04</span><div class="stretch-info"><div class="stretch-name">Glute Bridge</div><div class="stretch-detail">2 × 10 reps · Glute activation before squats</div></div></div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-label">Main Work · Lower A — Quad &amp; Glute Focus</div>
+      <div class="exercise-list">
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header"><div class="exercise-left"><div class="exercise-num">Exercise 01 of 05</div><div class="exercise-name">Hack Squat</div><div class="exercise-muscle">Quadriceps · Glutes</div></div><div class="exercise-sets"><div class="sets-label">1×4-6</div><div class="sets-sub">+ 1×8-10</div><div class="sets-weight">40–50 kg plates</div></div><span class="expand-icon">+</span></div>
+          <div class="exercise-expand"><div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>40–50 kg</span>&nbsp; plate load</div><br>Preferred over barbell squat: less warm-up time, safer for beginners, same quads stimulus. Allow knees past toes — biomechanically safe per research. RPE 9 on heavy set. Full depth always.</div></div>
+        </div>
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header"><div class="exercise-left"><div class="exercise-num">Exercise 02 of 05</div><div class="exercise-name">Dumbbell Romanian Deadlift</div><div class="exercise-muscle">Hamstrings · Glutes · Erectors</div></div><div class="exercise-sets"><div class="sets-label">2×8-10</div><div class="sets-sub">sets × reps</div><div class="sets-weight">12 kg / hand</div></div><span class="expand-icon">+</span></div>
+          <div class="exercise-expand"><div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>12 kg DBs</span>&nbsp; per hand</div><br>Push hips back, don't think "bend down". Lower until you feel a deep hamstring stretch. No lower back rounding. Use straps if grip fails. This is your primary posterior chain builder.</div></div>
+        </div>
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header"><div class="exercise-left"><div class="exercise-num">Exercise 03 of 05</div><div class="exercise-name">Dumbbell Step-Up</div><div class="exercise-muscle">Quadriceps · Glutes</div></div><div class="exercise-sets"><div class="sets-label">1×8-10</div><div class="sets-sub">per leg</div><div class="sets-weight">8 kg / hand</div></div><span class="expand-icon">+</span></div>
+          <div class="exercise-expand"><div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>8 kg DBs</span>&nbsp; per hand</div><br>Front leg does ALL the work — back leg just balances. Work each leg separately (don't alternate). Use heavier DBs than you think you need. Most people underload this movement significantly.</div></div>
+        </div>
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header"><div class="exercise-left"><div class="exercise-num">Exercise 04 of 05</div><div class="exercise-name">Seated Leg Curl</div><div class="exercise-muscle">Hamstrings</div></div><div class="exercise-sets"><div class="sets-label">1×10-12</div><div class="sets-sub">+ dropset</div><div class="sets-weight">20–25 kg stack</div></div><span class="expand-icon">+</span></div>
+          <div class="exercise-expand"><div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>20–25 kg</span>&nbsp; stack</div><br>2020 study: seated curls produce significantly greater hamstring hypertrophy than lying curls due to increased stretch. Lean forward over machine to amplify stretch. Hit failure, drop 30–40%, fail again.</div></div>
+        </div>
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header"><div class="exercise-left"><div class="exercise-num">Exercise 05 of 05</div><div class="exercise-name">Leg Press Calf Raise</div><div class="exercise-muscle">Gastrocnemius · Soleus</div></div><div class="exercise-sets"><div class="sets-label">1×12-15</div><div class="sets-sub">+ dropset</div><div class="sets-weight">40–50 kg stack</div></div><span class="expand-icon">+</span></div>
+          <div class="exercise-expand"><div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>40–50 kg</span>&nbsp; leg press stack</div><br>Full 1-second pause at bottom (deep stretch), full squeeze at top. Never bounce — calves respond to time under tension. Drop 30% at failure. Calves need high frequency — don't skip these.</div></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-label">Cooldown · 5 min</div>
+      <div class="section-title">Static Restoration</div>
+      <p class="section-note">Lower body recovery. Hold 30–45 seconds per stretch.</p>
+      <div class="stretch-list">
+        <div class="stretch-item"><span class="stretch-num">01</span><div class="stretch-info"><div class="stretch-name">Standing Quad Stretch</div><div class="stretch-detail">45 sec each leg · Rectus femoris</div></div></div>
+        <div class="stretch-item"><span class="stretch-num">02</span><div class="stretch-info"><div class="stretch-name">Lying Figure-4 Hip Stretch</div><div class="stretch-detail">45 sec each side · Piriformis, glutes</div></div></div>
+        <div class="stretch-item"><span class="stretch-num">03</span><div class="stretch-info"><div class="stretch-name">Standing Hamstring Stretch</div><div class="stretch-detail">30 sec each leg · Biceps femoris</div></div></div>
+        <div class="stretch-item"><span class="stretch-num">04</span><div class="stretch-info"><div class="stretch-name">Standing Calf Stretch (wall)</div><div class="stretch-detail">30 sec each · Gastrocnemius + soleus</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPPER B -->
+  <div class="workout-day" id="day-upper2">
+    <div class="section-block">
+      <div class="section-label">Warmup · 5 min</div>
+      <div class="section-title">Dynamic Preparation</div>
+      <p class="section-note">Shoulder and thoracic spine activation for press-heavy day.</p>
+      <div class="stretch-list">
+        <div class="stretch-item"><span class="stretch-num">01</span><div class="stretch-info"><div class="stretch-name">Thoracic Spine Rotation</div><div class="stretch-detail">10 each side · Upper back mobility</div></div></div>
+        <div class="stretch-item"><span class="stretch-num">02</span><div class="stretch-info"><div class="stretch-name">90/90 Shoulder Rotations</div><div class="stretch-detail">10 each · Internal/external rotator cuff warm-up</div></div></div>
+        <div class="stretch-item"><span class="stretch-num">03</span><div class="stretch-info"><div class="stretch-name">Cat-Cow</div><div class="stretch-detail">10 reps · Spinal mobility, serratus activation</div></div></div>
+        <div class="stretch-item"><span class="stretch-num">04</span><div class="stretch-info"><div class="stretch-name">Shoulder Dislocates (band)</div><div class="stretch-detail">10 reps · Overhead shoulder mobility</div></div></div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-label">Main Work · Upper B — Shoulder &amp; Pull Focus</div>
+      <div class="exercise-list">
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header"><div class="exercise-left"><div class="exercise-num">Exercise 01 of 06</div><div class="exercise-name">High-Incline Smith Machine Press</div><div class="exercise-muscle">Upper Pecs · Anterior Delt · Triceps</div></div><div class="exercise-sets"><div class="sets-label">2×10-12</div><div class="sets-sub">sets × reps</div><div class="sets-weight">20 kg bar + plates</div></div><span class="expand-icon">+</span></div>
+          <div class="exercise-expand"><div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>20 kg</span>&nbsp; bar + plates</div><br>Set bench 45–60°. One movement for both chest and shoulder press stimulus — time-efficient. Slightly close grip shifts emphasis to upper chest. Superset with T-bar row (alternate without full rest).</div></div>
+        </div>
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header"><div class="exercise-left"><div class="exercise-num">Exercise 02 of 06</div><div class="exercise-name">T-Bar Row (Superset)</div><div class="exercise-muscle">Mid-Traps · Rhomboids · Lats · Biceps</div></div><div class="exercise-sets"><div class="sets-label">2×10-12</div><div class="sets-sub">supersetted</div><div class="sets-weight">20–25 kg plates</div></div><span class="expand-icon">+</span></div>
+          <div class="exercise-expand"><div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>20–25 kg</span>&nbsp; plate load</div><br>Antagonist superset with incline press — chest rests while back works. Set 1: wide grip (rear delts, upper traps). Set 2: close grip (lower lats, biceps). Rest 30–60s between supersets total.</div></div>
+        </div>
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header"><div class="exercise-left"><div class="exercise-num">Exercise 03 of 06</div><div class="exercise-name">Dumbbell Shoulder Press</div><div class="exercise-muscle">Medial &amp; Anterior Deltoid</div></div><div class="exercise-sets"><div class="sets-label">2×10-12</div><div class="sets-sub">sets × reps</div><div class="sets-weight">8 kg / hand</div></div><span class="expand-icon">+</span></div>
+          <div class="exercise-expand"><div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>8 kg DBs</span>&nbsp; per hand</div><br>Seated for stability as a beginner. Don't lock out at top — keep tension on delts. Lower to ear level for full ROM. Brace core, avoid lower-back arch. Your primary shoulder mass builder this day.</div></div>
+        </div>
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header"><div class="exercise-left"><div class="exercise-num">Exercise 04 of 06</div><div class="exercise-name">Face Pulls</div><div class="exercise-muscle">Rear Delts · External Rotators · Traps</div></div><div class="exercise-sets"><div class="sets-label">2×15-20</div><div class="sets-sub">sets × reps</div><div class="sets-weight">7–10 kg cable</div></div><span class="expand-icon">+</span></div>
+          <div class="exercise-expand"><div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>7–10 kg</span>&nbsp; cable stack</div><br>Essential for shoulder health. Cable at forehead height. Pull to face, externally rotate at end (thumbs behind ears). High reps, moderate weight. Balances all the pressing work and protects rotator cuff.</div></div>
+        </div>
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header"><div class="exercise-left"><div class="exercise-num">Exercise 05 of 06</div><div class="exercise-name">Dumbbell Hammer Curl</div><div class="exercise-muscle">Brachialis · Brachioradialis · Biceps</div></div><div class="exercise-sets"><div class="sets-label">2×10-12</div><div class="sets-sub">sets × reps</div><div class="sets-weight">8 kg / hand</div></div><span class="expand-icon">+</span></div>
+          <div class="exercise-expand"><div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>8 kg DBs</span>&nbsp; per hand</div><br>Neutral grip targets brachialis (pushes bicep up, adds arm thickness). Alternate arms. Don't swing. Full ROM — stretch at bottom is where growth happens. Complements EZ-bar curls from Upper A.</div></div>
+        </div>
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header"><div class="exercise-left"><div class="exercise-num">Exercise 06 of 06</div><div class="exercise-name">Cable Crunch</div><div class="exercise-muscle">Rectus Abdominis</div></div><div class="exercise-sets"><div class="sets-label">1×12-15</div><div class="sets-sub">+ double dropset</div><div class="sets-weight">15–20 kg cable</div></div><span class="expand-icon">+</span></div>
+          <div class="exercise-expand"><div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>15–20 kg</span>&nbsp; cable stack</div><br>Kneel with rope above head. Round entire spine including lower back as you crunch. Hit failure, drop 30%, fail again, drop 20%, fail one last time. Abs respond to load — don't go too light.</div></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-label">Cooldown · 5 min</div>
+      <div class="section-title">Static Restoration</div>
+      <div class="stretch-list">
+        <div class="stretch-item"><span class="stretch-num">01</span><div class="stretch-info"><div class="stretch-name">Chest / Anterior Delt Stretch</div><div class="stretch-detail">45 sec · Doorway or wall corner</div></div></div>
+        <div class="stretch-item"><span class="stretch-num">02</span><div class="stretch-info"><div class="stretch-name">Side-Lying Thoracic Rotation</div><div class="stretch-detail">30 sec each · Upper back decompression</div></div></div>
+        <div class="stretch-item"><span class="stretch-num">03</span><div class="stretch-info"><div class="stretch-name">Child's Pose</div><div class="stretch-detail">60 sec · Lats, spine elongation, recovery</div></div></div>
+        <div class="stretch-item"><span class="stretch-num">04</span><div class="stretch-info"><div class="stretch-name">Neck Rolls (gentle)</div><div class="stretch-detail">5 slow rolls each direction · Trap tension release</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOWER B -->
+  <div class="workout-day" id="day-lower2">
+    <div class="section-block">
+      <div class="section-label">Warmup · 5 min</div>
+      <div class="section-title">Dynamic Preparation</div>
+      <p class="section-note">Hip hinge pattern + hamstring-focused warm-up for deadlift day.</p>
+      <div class="stretch-list">
+        <div class="stretch-item"><span class="stretch-num">01</span><div class="stretch-info"><div class="stretch-name">Hip Hinge Pattern (unloaded)</div><div class="stretch-detail">10 reps · Groove the RDL movement first</div></div></div>
+        <div class="stretch-item"><span class="stretch-num">02</span><div class="stretch-info"><div class="stretch-name">World's Greatest Stretch</div><div class="stretch-detail">5 each side · Hip flexors, thoracic, ankles</div></div></div>
+        <div class="stretch-item"><span class="stretch-num">03</span><div class="stretch-info"><div class="stretch-name">Nordic Hamstring Eccentric (partial)</div><div class="stretch-detail">5 reps slow · Hamstring prep, injury prevention</div></div></div>
+        <div class="stretch-item"><span class="stretch-num">04</span><div class="stretch-info"><div class="stretch-name">Bodyweight Lateral Lunge</div><div class="stretch-detail">10 each side · Hip adductors, groins</div></div></div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-label">Main Work · Lower B — Hamstring &amp; Glute Focus</div>
+      <div class="exercise-list">
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header"><div class="exercise-left"><div class="exercise-num">Exercise 01 of 05</div><div class="exercise-name">Leg Press</div><div class="exercise-muscle">Quadriceps · Glutes</div></div><div class="exercise-sets"><div class="sets-label">3×10-12</div><div class="sets-sub">sets × reps</div><div class="sets-weight">50–60 kg stack</div></div><span class="expand-icon">+</span></div>
+          <div class="exercise-expand"><div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>50–60 kg</span>&nbsp; plate load</div><br>Foot placement: mid-height, shoulder width. Full depth (hips crease below knees). Don't lock knees at top. Safer CNS demand vs. hack squat — good for a second leg day. Focus on quad squeeze on the way up.</div></div>
+        </div>
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header"><div class="exercise-left"><div class="exercise-num">Exercise 02 of 05</div><div class="exercise-name">Hip Thrust (Barbell or Machine)</div><div class="exercise-muscle">Glutes · Hamstrings</div></div><div class="exercise-sets"><div class="sets-label">3×10-12</div><div class="sets-sub">sets × reps</div><div class="sets-weight">20 kg barbell</div></div><span class="expand-icon">+</span></div>
+          <div class="exercise-expand"><div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>20 kg</span>&nbsp; barbell / bodyweight machine</div><br>The single most effective glute exercise per EMG research. Full hip extension at top — hard squeeze. Chin to chest (keeps spine neutral). Drive through heels. Bret Contreras' research confirms this as king for glutes.</div></div>
+        </div>
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header"><div class="exercise-left"><div class="exercise-num">Exercise 03 of 05</div><div class="exercise-name">Lying Leg Curl</div><div class="exercise-muscle">Hamstrings (biceps femoris)</div></div><div class="exercise-sets"><div class="sets-label">2×10-12</div><div class="sets-sub">sets × reps</div><div class="sets-weight">15–20 kg stack</div></div><span class="expand-icon">+</span></div>
+          <div class="exercise-expand"><div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>15–20 kg</span>&nbsp; stack</div><br>Complements seated leg curl from Lower A (different angle of stretch). Full ROM — don't cheat the stretch. Plantarflex feet (toes down) to emphasize biceps femoris. Slow eccentric (3 seconds down).</div></div>
+        </div>
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header"><div class="exercise-left"><div class="exercise-num">Exercise 04 of 05</div><div class="exercise-name">Walking Lunges</div><div class="exercise-muscle">Quads · Glutes · Hip Flexors</div></div><div class="exercise-sets"><div class="sets-label">2×10</div><div class="sets-sub">steps each leg</div><div class="sets-weight">Bodyweight → 6 kg wk3</div></div><span class="expand-icon">+</span></div>
+          <div class="exercise-expand"><div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>Bodyweight</span>&nbsp; → 6 kg DBs wk 3+</div><br>Add light dumbbells once bodyweight feels easy. Keep torso upright. Long stride for more glute; short stride for more quad. Back knee just above floor level. Great for hip symmetry and single-leg stability.</div></div>
+        </div>
+
+        <div class="exercise-item" onclick="toggleExercise(this)">
+          <div class="exercise-header"><div class="exercise-left"><div class="exercise-num">Exercise 05 of 05</div><div class="exercise-name">Tibialis Raise + Standing Calf Raise</div><div class="exercise-muscle">Calves · Tibialis Anterior</div></div><div class="exercise-sets"><div class="sets-label">2×15</div><div class="sets-sub">each movement</div><div class="sets-weight">Bodyweight</div></div><span class="expand-icon">+</span></div>
+          <div class="exercise-expand"><div class="exercise-note"><div class="weight-badge">Start weight &nbsp;<span>Bodyweight</span>&nbsp; both movements</div><br>Tibialis raises (toes up against wall) reduce shin splints and balance calf development. Follow with standing calf raise: full stretch at bottom, full squeeze at top. 1-second pause each end.</div></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-label">Cooldown · 5 min</div>
+      <div class="section-title">Static Restoration</div>
+      <div class="stretch-list">
+        <div class="stretch-item"><span class="stretch-num">01</span><div class="stretch-info"><div class="stretch-name">Lying Glute Stretch (figure-4)</div><div class="stretch-detail">60 sec each · Piriformis, deep hip rotators</div></div></div>
+        <div class="stretch-item"><span class="stretch-num">02</span><div class="stretch-info"><div class="stretch-name">Kneeling Hip Flexor Stretch</div><div class="stretch-detail">45 sec each · Psoas, rectus femoris</div></div></div>
+        <div class="stretch-item"><span class="stretch-num">03</span><div class="stretch-info"><div class="stretch-name">Supine Hamstring Stretch</div><div class="stretch-detail">45 sec each · Biceps femoris</div></div></div>
+        <div class="stretch-item"><span class="stretch-num">04</span><div class="stretch-info"><div class="stretch-name">Child's Pose with Side Reach</div><div class="stretch-detail">30 sec each side · Lats, quadratus lumborum</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2: PROGRESSION -->
+<div class="screen" id="screen-progression">
+  <div class="page-header">
+    <div class="eyebrow">Science-Backed Method</div>
+    <h1>Progression<br><em>Rules</em></h1>
+    <p>How to get stronger, when to push, when to rest, and how to know you're growing.</p>
+  </div>
+
+  <div class="rule-block">
+    <div class="rule-number">01</div>
+    <div class="rule-title">The Double Progression Method</div>
+    <div class="rule-body">
+      Work within a rep range (e.g. 8–10). <strong>Every session, try to add 1 rep to each set</strong> without form breakdown. Once you hit the top of your range on all sets, add weight next session (2.5kg for upper, 5kg for lower). Then start again at the bottom of the range with the new weight.
+    </div>
+    <div class="rule-highlight">Example: Lat Pulldown 8-10 reps @ 30kg → Hit 10,10 for two sessions → Next session: 32.5kg × 8 reps. Repeat.</div>
+  </div>
+
+  <div class="rule-block">
+    <div class="rule-number">02</div>
+    <div class="rule-title">RPE — Rate of Perceived Exertion</div>
+    <div class="rule-body">
+      Every working set should end at <strong>RPE 8–9</strong> (1–2 reps left in the tank), not RPE 10 (true failure) every time. Reserve true failure for the final set only, or when using drop sets / myo-reps. Going to failure every set increases injury risk and impairs recovery without extra growth benefit.
+    </div>
+    <div class="rule-highlight">Phases 1–2 (Weeks 1–16): Stay RPE 7–8. Build form. Phases 3–4 (Weeks 17–52): Push to RPE 9 on final sets.</div>
+  </div>
+
+  <div class="rule-block">
+    <div class="rule-number">03</div>
+    <div class="rule-title">Deload Every 4–6 Weeks</div>
+    <div class="rule-body">
+      Every 4–6 weeks, take one <strong>deload week</strong>: drop all weights by 40–50%, keep the same exercises, same reps. This allows connective tissue, joints, and the CNS to recover. Skipping deloads leads to accumulated fatigue masking fitness. You will feel stronger after a deload — this is the process working.
+    </div>
+    <div class="rule-highlight">During deload: 3 sets max per exercise, ~50% of normal load. Still go to the gym. Movement heals.</div>
+  </div>
+
+  <div class="rule-block">
+    <div class="rule-number">04</div>
+    <div class="rule-title">Progressive Overload Is Non-Negotiable</div>
+    <div class="rule-body">
+      Muscle grows only when challenged beyond what it's done before. Track your lifts. <strong>Every session should beat the last</strong> — even by 1 rep. Use a notes app or paper log. If you've been doing the same weight for 3+ weeks, something is wrong: sleep, food, or effort.
+    </div>
+    <div class="rule-highlight">Target: +0.5–1kg per week on major lifts for first 6 months (beginner gains are fast — use this window).</div>
+  </div>
+
+  <div class="rule-block">
+    <div class="rule-number">05</div>
+    <div class="rule-title">Volume Landmarks (MEV → MAV)</div>
+    <div class="rule-body">
+      Each muscle has a Minimum Effective Volume (MEV) and Maximum Adaptive Volume (MAV). <strong>Start at MEV, increase 1–2 sets per muscle per mesocycle</strong> (4–6 week block). Signs you've exceeded MAV: persistent soreness 4+ days, decreasing strength, poor sleep. Signs you're below MEV: no pump, no soreness, gains stalled.
+    </div>
+    <div class="rule-highlight">Phase 1: 10–12 sets/muscle/week. Phase 2: 12–14. Phase 3–4: 14–16. (Based on Israetel et al., RP Strength)</div>
+  </div>
+
+  <div class="rule-block">
+    <div class="rule-number">06</div>
+    <div class="rule-title">Form First — Always</div>
+    <div class="rule-body">
+      Ego lifting is the fastest path to zero gains. If your form breaks down, <strong>the target muscle is no longer doing the work</strong> — other muscles compensate. For the first 12 weeks, record yourself on 1 set per exercise. Compare to technique cues. Form is the skill — treat it as seriously as the weight.
+    </div>
+    <div class="rule-highlight">Red flags: excessive lower back arch on press, knees caving on squat, momentum on curls. Film and self-audit monthly.</div>
+  </div>
+
+  <div class="rule-block">
+    <div class="rule-number">07</div>
+    <div class="rule-title">Sleep Is the Anabolic Window</div>
+    <div class="rule-body">
+      More muscle is built during sleep than during training. Growth hormone peaks during deep sleep. <strong>7–9 hours is the target</strong>. Chronically sleeping 6 hours cuts testosterone by ~15% and suppresses muscle protein synthesis. No supplement replaces sleep for muscle growth.
+    </div>
+    <div class="rule-highlight">If stressed or poor sleep: reduce training intensity (not volume). Better to maintain than push into fatigue debt.</div>
+  </div>
+
+  <div class="rule-block">
+    <div class="rule-number">08</div>
+    <div class="rule-title">Minimum Rest Between Sets</div>
+    <div class="rule-body">
+      Research (Schoenfeld 2016) shows <strong>2–3 minute rest for compound lifts, 1–2 min for isolation</strong> maximizes strength and hypertrophy. Rushing rest reduces performance on next set, reducing total volume. Use a timer — don't guess. Supersets (antagonists) allow you to rest one muscle while working another.
+    </div>
+    <div class="rule-highlight">Hack Squat / Leg Press: 3 min. DB Press, RDL: 2–3 min. Curls, Laterals, Cables: 60–90 sec.</div>
+  </div>
+</div>
+
+<!-- SCREEN 3: 52-WEEK PLAN -->
+<div class="screen" id="screen-plan">
+  <div class="page-header">
+    <div class="eyebrow">Your Year Ahead</div>
+    <h1>52-Week<br><em>Plan</em></h1>
+    <p>Four phases. One year. From foundation to physique. Aligned with your goal.</p>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div class="phase-header">
+    <div class="phase-label">Phase 01 of 04</div>
+    <div class="phase-title">Foundation</div>
+    <div class="phase-weeks">Weeks 1 – 12</div>
+    <p class="phase-desc">Build movement quality, neurological efficiency, and the habit of training. Form mastery over load. Beginner gains are fastest here — trust the process. Target: +3–4kg bodyweight.</p>
+  </div>
+  <div class="week-list">
+    <div class="week-row">
+      <div class="week-num">W 1–2</div>
+      <div class="week-content"><div class="week-focus">Orientation & Technique</div><div class="week-detail">Learn all 4 workouts. Record form on key lifts. Go to RPE 6–7 only. Priority is movement pattern, not weight.</div><span class="week-tag">Orientation</span></div>
+    </div>
+    <div class="week-row">
+      <div class="week-num">W 3–4</div>
+      <div class="week-content"><div class="week-focus">Load Calibration</div><div class="week-detail">Find your working weights across all exercises. Use double progression. Begin tracking every session in a notes app.</div><span class="week-tag">Establish Baseline</span></div>
+    </div>
+    <div class="week-row">
+      <div class="week-num">W 5–6</div>
+      <div class="week-content"><div class="week-focus">First Progression Block</div><div class="week-detail">Add weight wherever you've hit the rep ceiling. Drop sets introduced on isolation lifts (laterals, curls). RPE 8 on final sets.</div><span class="week-tag">Progressive Load</span></div>
+    </div>
+    <div class="week-row deload">
+      <div class="week-num">W 7</div>
+      <div class="week-content"><div class="week-focus">Deload</div><div class="week-detail">50% of normal weights. 3 sets max per exercise. Active recovery. Sleep priority week.</div><span class="week-tag">Deload</span></div>
+    </div>
+    <div class="week-row">
+      <div class="week-num">W 8–10</div>
+      <div class="week-content"><div class="week-focus">Volume Introduction</div><div class="week-detail">Add 1 working set to main compound lifts. Begin myo-reps on bicep curl. Introduce superset pairing on Upper B (incline + T-bar row).</div><span class="week-tag">Volume Increase</span></div>
+    </div>
+    <div class="week-row">
+      <div class="week-num">W 11–12</div>
+      <div class="week-content"><div class="week-focus">Peak Phase 1</div><div class="week-detail">Push for PRs on main lifts. RPE 9 final sets. Photograph physique at Week 12 for comparison. Note strength gains vs. Week 1.</div><span class="week-tag">Peak & Assess</span></div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase-header">
+    <div class="phase-label">Phase 02 of 04</div>
+    <div class="phase-title">Accumulation</div>
+    <div class="phase-weeks">Weeks 13 – 24</div>
+    <p class="phase-desc">Build the machine. Systematic volume increase, stronger mind-muscle connection. Visible shape changes begin. Target: +3–4kg more bodyweight, visible shoulder width, arm separation.</p>
+  </div>
+  <div class="week-list">
+    <div class="week-row">
+      <div class="week-num">W 13–14</div>
+      <div class="week-content"><div class="week-focus">Phase Reset & Volume Bump</div><div class="week-detail">Add 1–2 sets across key muscles. Reassess working weights — you're stronger now. Refilm form check.</div><span class="week-tag">New Block Start</span></div>
+    </div>
+    <div class="week-row">
+      <div class="week-num">W 15–17</div>
+      <div class="week-content"><div class="week-focus">Strength + Hypertrophy Emphasis</div><div class="week-detail">Keep heavy sets (4-6 reps) on compound lifts. Add isolation intensity techniques: myo-reps on laterals, double drop sets on leg curls.</div><span class="week-tag">Intensity Increase</span></div>
+    </div>
+    <div class="week-row deload">
+      <div class="week-num">W 18</div>
+      <div class="week-content"><div class="week-focus">Deload</div><div class="week-detail">Full deload. Optional: replace gym sessions with 30-min walks or light mobility work.</div><span class="week-tag">Deload</span></div>
+    </div>
+    <div class="week-row">
+      <div class="week-num">W 19–22</div>
+      <div class="week-content"><div class="week-focus">Maximum Adaptive Volume Block</div><div class="week-detail">12–14 sets/muscle/week. All intensity techniques active. Log every session. Chase PRs on hack squat and dumbbell press.</div><span class="week-tag">MAV Block</span></div>
+    </div>
+    <div class="week-row">
+      <div class="week-num">W 23–24</div>
+      <div class="week-content"><div class="week-focus">Phase 2 Peak</div><div class="week-detail">PR attempts on 5 key lifts. Photograph Week 24. Assess which muscle groups lag — adjust exercise selection for Phase 3.</div><span class="week-tag">Peak & Assess</span></div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase-header">
+    <div class="phase-label">Phase 03 of 04</div>
+    <div class="phase-title">Intensification</div>
+    <div class="phase-weeks">Weeks 25 – 38</div>
+    <p class="phase-desc">Refine the physique. Lower relative volume, higher intensity. Strength numbers surge. Body composition shifts noticeably. Target: clear V-taper development, arm size +1–2 inches.</p>
+  </div>
+  <div class="week-list">
+    <div class="week-row">
+      <div class="week-num">W 25–26</div>
+      <div class="week-content"><div class="week-focus">Exercise Variation Swap</div><div class="week-detail">Swap 1–2 exercises per day to address lagging areas. E.g. if upper chest is weak: replace incline Smith with cable incline press. Keep core 4 movements unchanged.</div><span class="week-tag">Variation</span></div>
+    </div>
+    <div class="week-row">
+      <div class="week-num">W 27–30</div>
+      <div class="week-content"><div class="week-focus">Strength-First Mesocycle</div><div class="week-detail">Heavy sets: 3–5 reps, RPE 9. Drop back-off sets to 6–8 reps. Volume slightly lower. Neuromuscular strength drives long-term size. Prioritize big compound lifts.</div><span class="week-tag">Strength Focus</span></div>
+    </div>
+    <div class="week-row deload">
+      <div class="week-num">W 31</div>
+      <div class="week-content"><div class="week-focus">Deload</div><div class="week-detail">After 6 weeks of high intensity — mandatory. Full deload. Prioritize sleep, massage, mobility.</div><span class="week-tag">Deload</span></div>
+    </div>
+    <div class="week-row">
+      <div class="week-num">W 32–36</div>
+      <div class="week-content"><div class="week-focus">Hypertrophy Return</div><div class="week-detail">Return to 8–12 rep ranges with heavier loads than Phase 2. You're now stronger — same rep range hits the muscle harder. Volume at 14–16 sets/muscle/week.</div><span class="week-tag">Loaded Hypertrophy</span></div>
+    </div>
+    <div class="week-row">
+      <div class="week-num">W 37–38</div>
+      <div class="week-content"><div class="week-focus">Phase 3 Peak</div><div class="week-detail">All-time PRs attempted. Photograph Week 38. Compare to Week 1. The transformation should be clearly visible at this point.</div><span class="week-tag">Peak & Assess</span></div>
+    </div>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase-header">
+    <div class="phase-label">Phase 04 of 04</div>
+    <div class="phase-title">Refinement</div>
+    <div class="phase-weeks">Weeks 39 – 52</div>
+    <p class="phase-desc">Polish the physique. Advanced techniques, weak point specialization, body composition optimization. By Week 52, target physique is largely achieved. Target: 65–68kg lean bodyweight.</p>
+  </div>
+  <div class="week-list">
+    <div class="week-row">
+      <div class="week-num">W 39–42</div>
+      <div class="week-content"><div class="week-focus">Specialization Block</div><div class="week-detail">Add 1–2 extra sets for your 2 weakest muscle groups. Everything else maintains. E.g. if arms need work: +1 set bicep, +1 set tricep per upper day.</div><span class="week-tag">Specialization</span></div>
+    </div>
+    <div class="week-row">
+      <div class="week-num">W 43–45</div>
+      <div class="week-content"><div class="week-focus">Full Intensity Block</div><div class="week-detail">Every set taken to within 1 rep of failure. All intensity techniques (drop sets, myo-reps, supersets) active. This is the highest demand block of the year.</div><span class="week-tag">Max Intensity</span></div>
+    </div>
+    <div class="week-row deload">
+      <div class="week-num">W 46</div>
+      <div class="week-content"><div class="week-focus">Full Deload</div><div class="week-detail">Complete rest from loaded training. Light walking, stretching, or yoga only. Let the body consolidate 10+ months of stimulus.</div><span class="week-tag">Deload</span></div>
+    </div>
+    <div class="week-row">
+      <div class="week-num">W 47–50</div>
+      <div class="week-content"><div class="week-focus">Peak Shape Block</div><div class="week-detail">Return refreshed with significantly higher baseline strength. Chase lifetime PRs. Body composition at its best. Maintain caloric surplus +150–200 kcal over maintenance.</div><span class="week-tag">Peak Performance</span></div>
+    </div>
+    <div class="week-row">
+      <div class="week-num">W 51–52</div>
+      <div class="week-content"><div class="week-focus">Year-End Reflection</div><div class="week-detail">Final progress photos. Retest 1RM on 3 main lifts. Write your new baseline for Year 2. You've completed the foundation — the real work continues.</div><span class="week-tag">Complete</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-workouts" onclick="switchScreen('workouts')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6 5v14M18 5v14M3 8h3M18 8h3M3 16h3M18 16h3M6 12h12" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Workouts
+    <div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" id="nav-progression" onclick="switchScreen('progression')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 20l4-8 4 4 4-6 4 3" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="3" cy="20" r="1" fill="currentColor"/>
+    </svg>
+    Rules
+    <div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" id="nav-plan" onclick="switchScreen('plan')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="4" width="18" height="18" rx="2"/>
+      <path d="M16 2v4M8 2v4M3 10h18" stroke-linecap="round"/>
+      <path d="M8 14h2M14 14h2M8 18h2M14 18h2" stroke-linecap="round"/>
+    </svg>
+    52 Weeks
+    <div class="nav-dot"></div>
+  </button>
+</nav>
+
+<script>
+  // Restore saved theme on load
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark');
+  }
+
+  function toggleTheme() {
+    document.body.classList.toggle('dark');
+    localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+  }
+
+  function switchScreen(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('screen-' + name).classList.add('active');
+    document.getElementById('nav-' + name).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function switchDay(dayId) {
+    document.querySelectorAll('.workout-day').forEach(d => d.classList.remove('active'));
+    document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('day-' + dayId).classList.add('active');
+    event.target.classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function toggleExercise(el) {
+    const expand = el.querySelector('.exercise-expand');
+    const isOpen = el.classList.contains('open');
+    el.classList.toggle('open');
+    expand.classList.toggle('open');
+  }
+</script>
+</body>
+</html>
